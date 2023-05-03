@@ -37,6 +37,8 @@ public class FileTransferServer {
             int size = 0;
             OutputStream os = new FileOutputStream(fileName);
             BufferedOutputStream bos = new BufferedOutputStream(os);
+            DataOutputStream dos = new DataOutputStream(bos);
+
             while((size = dis.read(buffer)) > 0){
                 bos.write(buffer, 0, size);
                 totalReceived += size;
@@ -48,9 +50,12 @@ public class FileTransferServer {
             System.out.printf("final bytes received: %d\n", totalReceived);
             
             if(fileSize == totalReceived){
-                System.out.println("File Size Match");
+                dos.writeUTF(">>> to client: File Matches with Server");
+                dos.flush();
             }
+            
             bos.flush();
+            dos.close();
             bos.close();
             os.close();
 
@@ -58,6 +63,7 @@ public class FileTransferServer {
             client.close();
 
         }
+        
         server.close();
     }
 }

@@ -2,6 +2,8 @@ package com.yl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +14,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.DataTruncation;
+
+import javax.sound.sampled.SourceDataLine;
 
 /**
  * Hello world!
@@ -34,6 +39,8 @@ public class FileTransferClient
             OutputStream os = sock.getOutputStream();
             BufferedOutputStream bos = new BufferedOutputStream(os);
             DataOutputStream dos = new DataOutputStream(bos);
+
+
             
             //Send file metadata
             dos.writeUTF(fileName);
@@ -43,12 +50,19 @@ public class FileTransferClient
             //4k buffer
             byte[] buff = new byte [4*1024];
             int size = 0;
+            String msg = "";
             InputStream is = new FileInputStream(f);
             BufferedInputStream bis = new BufferedInputStream(is);
+            DataInputStream dis = new DataInputStream(bis);
+
             while((size = bis.read(buff)) > 0){
                 dos.write(buff, 0, size);
                 dos.flush();
             }
+
+            msg = dis.readUTF();
+            System.out.printf(">>> from server: %s\n", msg);
+            
 
             dos.close();
             is.close();
